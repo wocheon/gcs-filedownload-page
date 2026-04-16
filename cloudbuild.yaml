@@ -14,7 +14,7 @@ steps:
       'asia-northeast3-docker.pkg.dev/$PROJECT_ID/${_REPO_NAME}/${_IMAGE_NAME}:$COMMIT_SHA'
     ]
 
-  # 3. Cloud Run 배포 (네트워킹 및 보안 설정 반영)
+  # 3. Cloud Run 배포 (공개 액세스 허용 설정 반영)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
     args:
@@ -29,8 +29,10 @@ steps:
       - 'BUCKET_NAME=${_BUCKET_NAME}'
       - '--service-account'
       - '${_SERVICE_ACCOUNT_EMAIL}'
-      # --- 요청하신 네트워킹/보안 설정 ---
-      - '--ingress=all'                # 인그레스 : 전체
+      - '--ingress=all' 
+      # --- 수정된 부분: 공개 액세스 허용 ---
+      - '--allow-unauthenticated'
+      # ------------------------------------
       - '--platform'
       - 'managed'
 
@@ -38,7 +40,8 @@ substitutions:
   _SERVICE_NAME: 'crs-gcs-filedownload-page'
   _REPO_NAME: 'cloud-run-source-deploy'
   _IMAGE_NAME: 'gcs-filedownload-page/crs-gcs-filedownload-page'
-  _BUCKET_NAME: ' gcp-in-ca-test-bucket-wocheon07'
+  # [주의] 버킷명 앞의 공백을 제거했습니다.
+  _BUCKET_NAME: 'gcp-in-ca-test-bucket-wocheon07'
   _SERVICE_ACCOUNT_EMAIL: 'gcs-manage-sa@gcp-in-ca.iam.gserviceaccount.com'
 
 options:
