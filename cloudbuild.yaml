@@ -29,10 +29,8 @@ steps:
       - 'BUCKET_NAME=${_BUCKET_NAME}'
       - '--service-account'
       - '${_SERVICE_ACCOUNT_EMAIL}'
-      - '--ingress=all' 
-      # --- 수정된 부분: 공개 액세스 허용 ---
+      - '--ingress=all'       
       - '--allow-unauthenticated'
-      # ------------------------------------
       - '--platform'
       - 'managed'
 
