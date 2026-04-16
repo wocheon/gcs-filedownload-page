@@ -82,5 +82,12 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(publicPath, 'index.html'));
 });
 
+// [추가] Cloud Run 컨테이너 환경에서 서버를 실제로 실행하는 로직
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
 // 진입점 설정
 exports.gcsFileApp = app;
