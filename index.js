@@ -7,9 +7,10 @@ const app = express();
 const storage = new Storage();
 const publicPath = path.join(__dirname, 'public');
 
-// 정적 파일 서빙 (favicon.png 등을 public 폴더에 배치)
+// 정적 파일 서빙
 app.use(express.static(publicPath));
 
+// API 엔드포인트: 파일 및 폴더 목록 조회
 app.get('/api/files', async (req, res) => {
   try {
     const prefix = req.query.path || '';
@@ -18,12 +19,14 @@ app.get('/api/files', async (req, res) => {
       delimiter: '/'
     });
 
+    // 폴더 목록 추출
     const folders = (apiResponse.prefixes || []).map(p => ({
       name: p.replace(prefix, '').replace('/', ''),
       fullPath: p,
       type: 'folder'
     }));
 
+    // 파일 목록 추출 및 Signed URL 생성
     const fileList = await Promise.all(
       files.filter(file => file.name !== prefix).map(async (file) => {
         const fileName = file.name.replace(prefix, '');
@@ -58,29 +61,24 @@ app.get('/api/files', async (req, res) => {
       })
     );
 
-    res.json({ bucketName, currentPath: prefix, folders, files: fileList });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-    // 버킷명과 함께 데이터 반환
-    res.json({
-      bucketName: bucketName,
-      currentPath: prefix,
-      folders: folders,
-      files: fileList
+    // 단일 응답 반환
+    res.json({ 
+      bucketName: bucketName, 
+      currentPath: prefix, 
+      folders: folders, 
+      files: fileList 
     });
+
   } catch (error) {
-    console.error("GCS Error:", error);
+    console.error("GCS API Error:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// 모든 경로를 index.html로 리다이렉트 (SPA 대응)
+// SPA 대응: 나머지 모든 경로는 index.html 반환
 app.get('*', (req, res) => {
   res.sendFile(path.join(publicPath, 'index.html'));
 });
 
-// Cloud Run Functions 진입점
+// 진입점 설정
 exports.gcsFileApp = app;
