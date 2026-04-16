@@ -2,6 +2,7 @@ const express = require('express');
 const { Storage } = require('@google-cloud/storage');
 const path = require('path');
 
+// Bucket명은 환경변수로 지정
 const bucketName = process.env.BUCKET_NAME;
 const app = express();
 const storage = new Storage();
@@ -35,6 +36,7 @@ app.get('/api/files', async (req, res) => {
         const [viewUrl] = await file.getSignedUrl({
           version: 'v4',
           action: 'read',
+          // 생성된 URL은 15분 간 유효 (15 X  60 X 1000ms)
           expires: Date.now() + 15 * 60 * 1000,
         });
 
